@@ -1,0 +1,6 @@
+@ControlVentas_HostAddress = http://localhost:5151
+
+GET {{ControlVentas_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

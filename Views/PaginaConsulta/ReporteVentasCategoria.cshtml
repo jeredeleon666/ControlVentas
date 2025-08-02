@@ -1,0 +1,432 @@
+﻿@{
+    ViewData["Title"] = "Reportes por Categoría";
+}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control de Ventas - Reportes por Categoría</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+            .header h1 {
+                font-size: 2.5rem;
+                margin-bottom: 10px;
+                font-weight: 300;
+            }
+
+            .header p {
+                opacity: 0.9;
+                font-size: 1.1rem;
+            }
+
+        .controls {
+            display: flex;
+            gap: 20px;
+            padding: 30px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+            .control-group label {
+                font-weight: 600;
+                color: #495057;
+                font-size: 0.9rem;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+
+        select {
+            padding: 12px 16px;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            font-size: 1rem;
+            background: white;
+            min-width: 200px;
+            transition: all 0.3s ease;
+        }
+
+            select:focus {
+                outline: none;
+                border-color: #667eea;
+                box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            }
+
+        .btn {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            align-self: flex-end;
+        }
+
+            .btn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+            }
+
+        .content {
+            padding: 30px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 60px;
+            color: #6c757d;
+            font-size: 1.2rem;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @@keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .results-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .results-count {
+            background: #667eea;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+        }
+
+        .product-card {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+            .product-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            }
+
+            .product-card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 4px;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            }
+
+        .product-name {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+
+        .product-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .stat {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: #6c757d;
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-value {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+
+            .stat-value.currency {
+                color: #28a745;
+            }
+
+            .stat-value.quantity {
+                color: #667eea;
+            }
+
+            .stat-value.sales {
+                color: #fd7e14;
+            }
+
+        .no-data {
+            text-align: center;
+            padding: 60px;
+            color: #6c757d;
+        }
+
+        .no-data-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        @@media (max-width: 768px) {
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .products-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Control de Ventas</h1>
+            <p>Reportes de productos por categoría y año</p>
+        </div>
+
+        <div class="controls">
+            <div class="control-group">
+                <label for="categoria">Categoría</label>
+                <select id="categoria">
+                    <option value="">Selecciona una categoría...</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label for="anio">Año</label>
+                <select id="anio">
+                    <option value="2019" selected>2019</option>
+                    <option value="2020">2020</option>
+                    <option value="2021">2021</option>
+                    <option value="2022">2022</option>
+                    <option value="2023">2023</option>
+                    <option value="2024">2024</option>
+                    <option value="2025">2025</option>
+                </select>
+            </div>
+
+            <button class="btn" onclick="cargarReporte()">Generar Reporte</button>
+        </div>
+
+        <div class="content">
+            <div id="loading" class="loading" style="display: none;">
+                <div class="spinner"></div>
+                <p>Cargando datos...</p>
+            </div>
+
+            <div id="results" style="display: none;">
+                <div class="results-header">
+                    <div class="results-title">Productos de la categoría</div>
+                    <div class="results-count" id="results-count">0 productos</div>
+                </div>
+                <div class="products-grid" id="products-grid"></div>
+            </div>
+
+            <div id="no-data" class="no-data">
+                <div class="no-data-icon">📋</div>
+                <h3>Selecciona una categoría y año para ver los reportes</h3>
+                <p>Los datos se mostrarán organizados por productos con sus estadísticas de venta</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Al cargar la página, iniciar carga de categorías
+        document.addEventListener('DOMContentLoaded', function () {
+            cargarCategorias();
+        });
+
+        /**
+         * Carga las categorías disponibles desde el backend
+         * y las inserta en el <select> correspondiente.
+         */
+        async function cargarCategorias() {
+            try {
+                const response = await fetch('/PaginaConsulta/GetCategorias');
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const categorias = await response.json();
+                const select = document.getElementById('categoria');
+                select.innerHTML = '<option value="">Selecciona una categoría...</option>';
+
+                categorias.forEach(cat => {
+                    const option = document.createElement('option');
+                    option.value = cat.codigo;
+                    option.textContent = cat.nombre;
+                    select.appendChild(option);
+                });
+            } catch (error) {
+                alert('No se pudo cargar la lista de categorías');
+            }
+        }
+
+        /**
+         * Llama al backend para obtener los datos del reporte
+         * en función de la categoría y año seleccionados.
+         */
+        async function cargarReporte() {
+            const categoria = document.getElementById('categoria').value;
+            const anio = document.getElementById('anio').value;
+
+            if (!categoria) {
+                alert('Por favor selecciona una categoría');
+                return;
+            }
+
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('results').style.display = 'none';
+            document.getElementById('no-data').style.display = 'none';
+
+            try {
+                const response = await fetch(`/PaginaConsulta/GetReporte?codigoCategoria=${categoria}&anio=${anio}`);
+                const productos = await response.json();
+                mostrarResultados(productos);
+            } catch (error) {
+                alert('Error al cargar el reporte');
+            } finally {
+                document.getElementById('loading').style.display = 'none';
+            }
+        }
+
+        /**
+         * Muestra los productos en la interfaz.
+         * Si no hay datos, se muestra el mensaje correspondiente.
+         */
+        function mostrarResultados(productos) {
+            const resultsDiv = document.getElementById('results');
+            const noDataDiv = document.getElementById('no-data');
+            const productsGrid = document.getElementById('products-grid');
+            const resultsCount = document.getElementById('results-count');
+
+            if (productos.length === 0) {
+                resultsDiv.style.display = 'none';
+                noDataDiv.innerHTML = `
+                    <div class="no-data-icon">📈</div>
+                    <h3>No se encontraron datos</h3>
+                    <p>No hay ventas registradas para la categoría y año seleccionados</p>
+                `;
+                noDataDiv.style.display = 'block';
+                return;
+            }
+
+            resultsCount.textContent = `${productos.length} producto${productos.length !== 1 ? 's' : ''}`;
+            productsGrid.innerHTML = productos.map(producto => `
+                <div class="product-card">
+                    <div class="product-name">${producto.nombreProducto}</div>
+                    <div class="product-stats">
+                        <div class="stat">
+                            <div class="stat-label">Total Vendido</div>
+                            <div class="stat-value quantity">${producto.totalCantidadVendida.toLocaleString()}</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-label">Ingresos</div>
+                            <div class="stat-value currency">$${producto.totalIngresos.toLocaleString('es-ES', { minimumFractionDigits: 2 })}</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-label">N° Ventas</div>
+                            <div class="stat-value sales">${producto.numeroVentas}</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-label">Código</div>
+                            <div class="stat-value">#${producto.codigoProducto}</div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            resultsDiv.style.display = 'block';
+            noDataDiv.style.display = 'none';
+        }
+    </script>
+</body>
+</html>
