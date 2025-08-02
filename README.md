@@ -16,6 +16,13 @@ Autor:   Jeremías Herminio de León Godínez
 ✔️ Modelo entidad-relación implementado según referencia proporcionada.  
 ✔️ Consulta que obtiene el   nombre de la categoría   del producto de la   última venta realizada  , según la fecha.
 
+✔️ Codigo para consulta del ultimo producto vendido:
+  SELECT TOP 1 p.Nombre AS NombreProducto
+  FROM Ventas v
+  INNER JOIN ItemVenta i ON v.CodigoVenta = i.CodigoVenta
+  INNER JOIN Producto p ON i.CodigoProducto = p.CodigoProducto
+  ORDER BY v.Fecha DESC, i.CodigoProducto DESC;
+
 ### B) Programación (.NET/C\# con ASP.NET)
 
 ✔️ Página web que muestra el   listado de productos vendidos  .  
