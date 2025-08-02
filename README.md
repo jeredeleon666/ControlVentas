@@ -1,4 +1,5 @@
 autor: Jeremías Herminio de Leon Godinez, jerededeleon@yahoo.com
+<img width="1679" height="845" alt="Captura de pantalla 2025-08-02 a la(s) 13 50 11" src="https://github.com/user-attachments/assets/16b4c122-943a-489c-9c7d-18d95d0ac0ae" />
 
 # 📊 Evaluación .NET/C\# Jr - Control de Ventas
 
